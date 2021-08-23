@@ -61,76 +61,73 @@ def writeToFile(data):
 
 
 readFromFile(itemsFound)
-done = False
 
+for x in searchingFor:
+    getFinderElems()
+    finderElems[0].send_keys(x)
+    finderElems[0].send_keys(Keys.RETURN)
 
-while not done:
-    for x in searchingFor:
-        getFinderElems()
-        finderElems[0].send_keys(x)
-        finderElems[0].send_keys(Keys.RETURN)
+    allAdverts = False
 
-        allAdverts = False
+    while not allAdverts:
+        wait_for(link_has_gone_stale)
 
-        while not allAdverts:
-            wait_for(link_has_gone_stale)
+        adverts = driver.find_elements_by_class_name("inzeraty")
 
-            adverts = driver.find_elements_by_class_name("inzeraty")
+        for i in adverts:
+            skip = False
+            number = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("href").split("inzerat/")[1].split("/")[0]
 
-            for i in adverts:
-                skip = False
-                number = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("href").split("inzerat/")[1].split("/")[0]
+            if number in numbersFound:
+                continue
+            else:
+                numbersFound.append(number)
 
-                if number in numbersFound:
+                filter_text = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("innerHTML").lower() + i.find_element_by_class_name("popis").get_attribute("innerHTML").lower()
+                
+                for remover in searchingRemove:
+                    if remover in filter_text:
+                        skip = True
+                        break
+
+                if skip:
                     continue
-                else:
-                    numbersFound.append(number)
 
-                    name = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("innerHTML").lower()
-                    
-                    for remover in searchingRemove:
-                        if remover in name:
-                            skip = True
-                            break
+                url = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("href")
+                name = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("innerHTML")
+                desc = i.find_element_by_class_name("popis").get_attribute("innerHTML")
 
-                    if skip:
-                        continue
+                try:
+                    img = i.find_element_by_tag_name("img").get_attribute("src")
+                except:
+                    continue
+                price = i.find_element_by_class_name("inzeratycena").find_element_by_tag_name("b").get_attribute("innerHTML")
+                itemsFound["inzeraty"].append({
+                    'number': number,
+                    'name': name,
+                    'description': desc,
+                    'img': img,
+                    'price': price,
+                    'seen': False,
+                    'url': url,
+                    })
 
-                    url = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("href")
-                    name = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("innerHTML")
-                    desc = i.find_element_by_class_name("popis").get_attribute("innerHTML")
+                print(name)
+                print("\t", number)
+                print("\t", price)
 
-                    try:
-                        img = i.find_element_by_tag_name("img").get_attribute("src")
-                    except:
-                        continue
-                    price = i.find_element_by_class_name("inzeratycena").find_element_by_tag_name("b").get_attribute("innerHTML")
-                    itemsFound["inzeraty"].append({
-                        'number': number,
-                        'name': name,
-                        'description': desc,
-                        'img': img,
-                        'price': price,
-                        'seen': False,
-                        'url': url,
-                        })
+        stranky = driver.find_element_by_class_name("strankovani").find_elements_by_tag_name("a")[-1]
 
-                    print(name)
-                    print("\t", number)
-                    print("\t", price)
+        try:
+            dalsiBtn = stranky.find_element_by_tag_name("b")
 
-            stranky = driver.find_element_by_class_name("strankovani").find_elements_by_tag_name("a")[-1]
-
-            try:
-                dalsiBtn = stranky.find_element_by_tag_name("b")
-
-                if dalsiBtn.get_attribute("innerHTML") == "Další":
-                    driver.get(stranky.get_attribute("href"))
-            except:
-                print("searching done")
-                allAdverts = True
+            if dalsiBtn.get_attribute("innerHTML") == "Další":
+                driver.get(stranky.get_attribute("href"))
+        except:
+            print("searching done")
+            allAdverts = True
 
 
-    writeToFile(itemsFound)
+writeToFile(itemsFound)
 
 driver.close()
