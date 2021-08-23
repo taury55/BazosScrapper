@@ -97,6 +97,8 @@ while not done:
                         continue
 
                     url = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("href")
+                    name = i.find_element_by_class_name("nadpis").find_element_by_tag_name("a").get_attribute("innerHTML")
+                    desc = i.find_element_by_class_name("popis").get_attribute("innerHTML")
 
                     try:
                         img = i.find_element_by_tag_name("img").get_attribute("src")
@@ -106,6 +108,7 @@ while not done:
                     itemsFound["inzeraty"].append({
                         'number': number,
                         'name': name,
+                        'description': desc,
                         'img': img,
                         'price': price,
                         'seen': False,
