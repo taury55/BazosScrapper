@@ -44,7 +44,7 @@ def getFinderElems():
 
 def readFromFile(data):
     try:
-        with open('data.txt') as json_file:
+        with open('data.json') as json_file:
             data = json.load(json_file)
 
         for i in data["inzeraty"]:
@@ -54,7 +54,7 @@ def readFromFile(data):
         return
 
 def writeToFile(data):
-    with open('data.txt', 'w') as outfile:
+    with open('data.json', 'w') as outfile:
         json.dump(data, outfile)
 
 

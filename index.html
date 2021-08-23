@@ -1,10 +1,49 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>Bazos Scrapper</title>
-	</head>
-	<body>
-	</body>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Bazos Scrapper</title>
+    <link rel="stylesheet" href="bazos54s.css" type="text/css" />
+  </head>
+  <body>
+    <div class="sirka" id="container_one">
+      
+    </div>
+	<script type="text/javascript" crossorigin="anonymous">
+		fetch('data.json', {mode:'cors'})
+			.then(response => response.json())
+			.then(data => {
+				data.inzeraty.sort(function(a, b) {
+					return parseInt(a.price.replace(" ", "").replace("Kč", ""), 10) > parseInt(b.price.replace(" ", "").replace("Kč", ""), 10);
+				});
+				
+				data.inzeraty.forEach(addInzerat)
+			})
+			
+		function addInzerat(item) {
+			document.getElementById("container_one").innerHTML += `
+				<div class='inzeraty inzeratyflex'>
+					<div class='inzeratynadpis'>
+						<span class='nadpis'>
+							<a href='`+item.url+`'>
+								`+item.name+`
+							</a>
+						</span> 
+						<a href='`+item.url+`'>
+							<img src='`+item.img+`' class='obrazek' width='150'/>
+						</a>
+						<div class='popis'>
+						</div>
+					</div>
+					<div class='inzeratycena'><b>`+item.price+`</b></div>
+					<div class='inzeratylok'>None<br/>000 00</div>
+					<div class='inzeratyview'>0 x</div>
+				</div>
+			`;
+		}
+	</script> 
+  </body>
 </html>
