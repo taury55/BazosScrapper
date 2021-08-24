@@ -1,42 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="generator"
-    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Bazos Scrapper</title>
-    <link rel="stylesheet" href="bazos54s.css" type="text/css" />
-  </head>
-  <body>
-    <div class="sirka" id="container_one">
-      
-    </div>
-	<script type="text/javascript" crossorigin="anonymous">
-		fetch('data.json', {mode:'cors'})
-			.then(response => response.json())
-			.then(data => {
-				data.inzeraty.sort(function(a, b) {
-					return parseInt(a.price.replace(" ", "").replace("Kč", ""), 10) > parseInt(b.price.replace(" ", "").replace("Kč", ""), 10);
-				});
-				
-				data.inzeraty.forEach(addInzerat)
-			})
-			
-		function addInzerat(item) {
-			document.getElementById("container_one").innerHTML += `
-				<div class='inzeraty inzeratyflex'>
-					<div class='inzeratynadpis'>
-						<span class='nadpis'>
-							<a href='`+item.url+`'>`+item.name+`</a>
-						</span> 
-						<a href='`+item.url+`'><img src='`+item.img+`' class='obrazek'/></a>
-						<div class='popis'>`+item.description+`</div>
-					</div>
-					<div class='inzeratycena'><b>`+item.price+`</b></div>
-				</div>
-			`;
-		}
-	</script> 
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>Bazos Scrapper</title>
+		<link rel="stylesheet" href="styles.css" type="text/css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<div id="old-scrappings">
+		</div>
+		<div class="scrapping">
+			<form class="new-scrapping-form" action="/scrapper/api/new-scrapping" method="POST" accept-charset="utf-8">
+				<label class="sf-label" for="searchingFor">Searching:</label>
+				<input type="text" value="" name="searchingFor" id="searchingFor"/>
+				<label class="pf-label" for="priceFrom">Price from:</label>
+				<input type="number" value="" name="priceFrom" id="priceFrom"/>
+				<label class="pt-label" for="priceTo">Price to:</label>
+				<input type="number" value="" name="priceTo" id="priceTo"/>
+				<label class="sfil-label" for="searchingFilter">Filter:</label>
+				<input type="text" value="" name="searchingFilter" id="searchingFilter"/>
+				<input class="create-btn" type="submit" value="Create"/>
+			</form>
+		</div>
+		<script type="text/javascript" crossorigin="anonymous">
+			fetch('/scrapper/api/scrappings', {mode:'cors'})
+	.then(response => response.json())
+	.then(data => {
+		data.forEach(addScrapping)
+	})
+
+function addScrapping(item) {
+	var state = "";
+	if (item.active) {
+		state = "On";
+	} else {
+		state = "Off";
+	}
+
+	document.getElementById("old-scrappings").innerHTML += `
+			<div class="scrapping">
+			<form class="new-scrapping-form" action="/scrapper/api/update-scrapping" method="POST" accept-charset="utf-8">
+				<input type="hidden" value="`+item.id+`" name="itemId" id="itemId"/>
+				<label class="sf-label" for="searchingFor">Searching:</label>
+				<input type="text"  name="searchingFor" id="searchingFor"value="`+item.searchingFor+`"/>
+				<label class="pf-label" for="priceFrom">Price from:</label>
+				<input type="number"  name="priceFrom" id="priceFrom" value="`+item.priceFrom+`"/>
+				<label class="pt-label" for="priceTo">Price to:</label>
+				<input type="number"  name="priceTo" id="priceTo" value="`+item.priceTo+`"/>
+				<label class="sfil-label" for="searchingFilter">Filter:</label>
+				<input type="text"  name="searchingFilter" id="searchingFilter" value="`+item.searchingFilter+`"/>
+				<input class="update-btn" type="submit" value="Update"/>
+			</form>
+			<form action="/scrapper/api/active-scrapping/`+item.id+`" method="get" accept-charset="utf-8">
+				<input class="state-btn `+state+`" type="submit" value="`+state+`"/>
+			</form>
+			<form action="inzeraty.html" method="get" accept-charset="utf-8">
+				<input type="hidden" value="`+item.id+`" name="id" id="id"/>
+				<input class="result-btn" type="submit" value="Results"/>
+			</form>
+			<form action="/scrapper/api/del-scrapping/`+item.id+`" method="get" accept-charset="utf-8">
+				<input class="del-btn" type="submit" value="Delete"/>
+			</form>
+			</div>
+	`;
+}
+		</script>
+	</body>
 </html>

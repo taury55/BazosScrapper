@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Bazos Scrapper</title>
+    <link rel="stylesheet" href="styles.css" type="text/css" />
+  </head>
+  <body>
+    <div id="inzeraty">
+    </div>
+	<script type="text/javascript" crossorigin="anonymous">
+		const urlParams = new URLSearchParams(window.location.search);
+
+		fetch('/scrapper/api/get-inzeraty/'+urlParams.get("id"), {mode:'cors'})
+			.then(response => response.json())
+			.then(data => {
+				data.sort(function(a, b) {
+					return a.price > b.price;
+				});
+				
+				data.forEach(addInzerat)
+			})
+			
+		function addInzerat(item) {
+			if (!item.seen) {
+				document.getElementById("inzeraty").innerHTML += `
+					<div class="inzerat">
+						<a class="inzerat-img" href='`+item.url+`'><img class="inzerat-img-inner" src='`+item.img+`' /></a>
+						<span class="inzerat-name"><a href='`+item.url+`'>`+item.name+`</a></span> 
+						<div class="inzerat-desc">`+item.description+`</div>
+						<div class="inzerat-price"><b>`+item.price+` Kč</b></div>
+						<form class="inzerat-seen" action="/scrapper/api/set-as-seen/`+item.id+`" method="get" accept-charset="utf-8">
+							<input class="del-btn" type="submit" value="Seen"/>
+						</form>
+					</div>
+				`;
+			}
+		}
+	</script> 
+  </body>
+</html>

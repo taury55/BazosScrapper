@@ -1,7 +1,7 @@
 const express  = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
-const config = require('./config.json');
+const config = require('../config.json');
 
 const app = express();
 const port = process.env.PORT || 4051;
@@ -35,6 +35,28 @@ app.get('/scrappings', async function (req, res) {
 	});
 });
 
+app.get('/set-as-seen/:itemId', async function (req, res) {
+	const sql = `UPDATE inzerat SET seen='1' WHERE id=?`;
+	con.query(sql, [req.params.itemId], (err, rows) => {
+		if (err) {
+			console.log("error: ", err);
+		}
+	});
+
+	res.redirect(req.get('referer'));
+});
+
+app.get('/get-inzeraty/:itemId', async function (req, res) {
+	const sql = `SELECT * FROM inzerat WHERE scrappingId=?`;
+	con.query(sql, [req.params.itemId], (err, rows) => {
+		if (err) {
+			console.log("error: ", err);
+		} else {
+			res.send(rows);
+		}
+	});
+});
+
 app.get('/active-scrapping/:itemId', async function (req, res) {
 	var sql = `SELECT active FROM scrapping WHERE id=?`;
 	con.query(sql, [req.params.itemId], function (err, result) {
@@ -56,12 +78,21 @@ app.get('/active-scrapping/:itemId', async function (req, res) {
 });
 
 app.get('/del-scrapping/:itemId', async function (req, res) {
-	const sql = `DELETE FROM scrapping WHERE id=?`;
+	var sql = `DELETE FROM scrapping WHERE id=?`;
 	con.query(sql, [req.params.itemId], function (err, result) {
 		if (err) {
 			console.log("error: ", err);
 		} else {
 			console.log("Scrapping removed.");
+		}
+	});
+
+	sql = `DELETE FROM inzerat WHERE scrappingId=?`;
+	con.query(sql, [req.params.itemId], function (err, result) {
+		if (err) {
+			console.log("error: ", err);
+		} else {
+			console.log("Inzeraty removed.");
 		}
 	});
 
