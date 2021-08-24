@@ -44,7 +44,7 @@ def getFinderElems():
 
 def readFromFile(data):
     try:
-        with open('data.json') as json_file:
+        with open('../web-frontend/data.json') as json_file:
             data = json.load(json_file)
 
         for i in data["inzeraty"]:
@@ -54,7 +54,7 @@ def readFromFile(data):
         return
 
 def writeToFile(data):
-    with open('data.json', 'w') as outfile:
+    with open('../web-frontend/data.json', 'w') as outfile:
         json.dump(data, outfile)
 
 
@@ -101,7 +101,8 @@ for x in searchingFor:
                     img = i.find_element_by_tag_name("img").get_attribute("src")
                 except:
                     continue
-                price = i.find_element_by_class_name("inzeratycena").find_element_by_tag_name("b").get_attribute("innerHTML")
+                price = int(i.find_element_by_class_name("inzeratycena").find_element_by_tag_name("b").get_attribute("innerHTML").replace(" ", "").replace("Kč", ""))
+
                 itemsFound["inzeraty"].append({
                     'number': number,
                     'name': name,
