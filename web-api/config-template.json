@@ -1,0 +1,6 @@
+{
+	"host": "localhost",
+	"user": [here put username for mysql],
+	"password": [here put password for mysql],
+	"database": [here put your name of DB]
+}
