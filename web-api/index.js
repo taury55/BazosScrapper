@@ -46,6 +46,17 @@ app.get('/set-as-seen/:itemId', async function (req, res) {
 	res.redirect(req.get('referer'));
 });
 
+app.get('/set-as-archived/:itemId', async function (req, res) {
+	const sql = `UPDATE inzerat SET archived='1' WHERE id=?`;
+	con.query(sql, [req.params.itemId], (err, rows) => {
+		if (err) {
+			console.log("error: ", err);
+		}
+	});
+
+	res.redirect(req.get('referer'));
+});
+
 app.get('/get-inzeraty/:itemId', async function (req, res) {
 	const sql = `SELECT * FROM inzerat WHERE scrappingId=?`;
 	con.query(sql, [req.params.itemId], (err, rows) => {

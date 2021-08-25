@@ -9,8 +9,10 @@ import numpy as np
 options = Options()
 options.add_argument('--headless')
 options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
+options.add_argument("--no-sandbox")
 
-driver = webdriver.Chrome('/snap/bin/chromium.chromedriver' ,options=options)
+driver = webdriver.Chrome('chromium.chromedriver' ,options=options)
 driver.get("https://www.bazos.cz")
 
 print("Driver running.")
@@ -124,8 +126,8 @@ for scrapper in scrappings:
                         continue
                     price = int(i.find_element_by_class_name("inzeratycena").find_element_by_tag_name("b").get_attribute("innerHTML").replace(" ", "").replace("Kč", ""))
 
-                    sql = "INSERT INTO inzerat (number, name, description, img, price, seen, url, scrappingId) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-                    par = (number, name, desc, img, price, False, url, scrapper[0])
+                    sql = "INSERT INTO inzerat (number, name, description, img, price, url, scrappingId) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    par = (number, name, desc, img, price, url, scrapper[0])
                     
                     mycursor.execute(sql, par)
                     mydb.commit()
